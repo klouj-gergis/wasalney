@@ -1,10 +1,16 @@
 
 "use client";
 
+
+
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import type { LatLngExpression } from "leaflet";
 
-const position: LatLngExpression = [29.971022, 32.552850];
+
+// Example default position (can be changed as needed)
+const position: LatLngExpression = [31.9686, 34.7736];
 
 const customIcon = L.icon({
   iconUrl: "/location-icon.svg",
