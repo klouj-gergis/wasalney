@@ -1,21 +1,25 @@
+
 "use client";
+
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import * as L from "leaflet";
+import type { LatLngExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
+const position: LatLngExpression = [29.971022, 32.552850];
 
 const customIcon = L.icon({
-  iconUrl: "/location-icon.svg", // path to your custom icon image
-  iconSize: [40, 40],      // size of the icon in px
-  iconAnchor: [20, 40],    // the point that sits on the coordinate (bottom-center for a pin)
-  popupAnchor: [0, -40],   // where the popup opens relative to iconAnchor
+  iconUrl: "/location-icon.svg",
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40],
 });
 
 export default function Map() {
-
   return (
     <MapContainer
-      center={[29.971022, 32.552850]}
-      zoom={25}
+      center={position}
+      zoom={18}
       scrollWheelZoom={true}
       style={{ height: "500px", width: "100%" }}
     >
@@ -23,9 +27,10 @@ export default function Map() {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <Marker position={[29.971022, 32.552850]} icon={customIcon}>
+
+      <Marker position={position} icon={customIcon}>
         <Popup>
-          A pretty CSS3 popup. <br /> Easily customizable.
+          A pretty CSS3 popup. Easily customizable.
         </Popup>
       </Marker>
     </MapContainer>
