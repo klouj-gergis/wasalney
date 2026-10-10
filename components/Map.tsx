@@ -100,9 +100,9 @@ export default function Map() {
   return (
     <div className="flex flex-col gap-4 w-full h-full p-4 rounded-2xl">
       {/* Destination selection */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
         {/* Step 1: Select an area */}
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 w-full">
           <label htmlFor="area" className="font-medium text-sm">
             Choose an area
           </label>
