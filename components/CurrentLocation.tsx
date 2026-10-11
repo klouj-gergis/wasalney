@@ -2,10 +2,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Circle, CircleMarker, useMap } from "react-leaflet";
+import {
+  Circle,
+  CircleMarker,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
 import type { LatLng } from "leaflet";
 
-// CHANGED 1: Define the callback prop.
 type Props = {
   onLocationChange: (position: {
     lat: number;
@@ -13,7 +17,6 @@ type Props = {
   }) => void;
 };
 
-// CHANGED 2: Accept onLocationChange as a prop.
 export default function CurrentLocation({
   onLocationChange,
 }: Props) {
@@ -24,6 +27,13 @@ export default function CurrentLocation({
   const [followUser, setFollowUser] = useState(true);
   const [error, setError] = useState("");
 
+  // Stop following when the user manually moves the map.
+  useMapEvents({
+    dragstart() {
+      setFollowUser(false);
+    },
+  });
+
   useEffect(() => {
     if (!navigator.geolocation) {
       setError("Geolocation is not supported.");
@@ -32,7 +42,11 @@ export default function CurrentLocation({
 
     const watchId = navigator.geolocation.watchPosition(
       (result) => {
-        const { latitude, longitude, accuracy } = result.coords;
+        const {
+          latitude,
+          longitude,
+          accuracy: gpsAccuracy,
+        } = result.coords;
 
         const newPosition: LatLng = {
           lat: latitude,
@@ -40,19 +54,18 @@ export default function CurrentLocation({
         } as LatLng;
 
         setPosition(newPosition);
-        setAccuracy(accuracy);
+        setAccuracy(gpsAccuracy);
         setError("");
 
-        // CHANGED 3: Send the latest coordinates to the parent.
-        // The parent uses these coordinates to calculate a route.
+        // Keep sending GPS updates to the parent for routing.
         onLocationChange({
           lat: latitude,
           lng: longitude,
         });
 
-        // Follow the user when follow mode is enabled.
+        // Only move the map while follow mode is enabled.
         if (followUser) {
-          map.panTo(newPosition);
+          map.panTo(newPosition, { animate: true });
         }
       },
       (err) => {
@@ -72,16 +85,12 @@ export default function CurrentLocation({
     return () => {
       navigator.geolocation.clearWatch(watchId);
     };
-
-    // CHANGED 4: Include the callback and follow mode
-    // because both are used inside this effect.
   }, [map, onLocationChange, followUser]);
 
   return (
     <>
       {position && (
         <>
-          {/* Approximate GPS accuracy area */}
           {accuracy !== null && (
             <Circle
               center={position}
@@ -95,7 +104,6 @@ export default function CurrentLocation({
             />
           )}
 
-          {/* Current user position */}
           <CircleMarker
             center={position}
             radius={8}
@@ -109,7 +117,7 @@ export default function CurrentLocation({
         </>
       )}
 
-      {/* Location controls */}
+      {/* Recenter control */}
       <div
         className="leaflet-bottom leaflet-right"
         style={{
@@ -122,14 +130,15 @@ export default function CurrentLocation({
         <button
           type="button"
           onClick={() => {
-            if (position) {
-              map.flyTo(position, 18);
-              setFollowUser(true);
-            }
+            if (!position) return;
+
+            setFollowUser(true);
+            map.flyTo(position, 18);
           }}
           className="rounded-full bg-white p-3 shadow-lg text-black"
           style={{ pointerEvents: "auto" }}
           aria-label="Center on my location"
+          title="Center on my location"
         >
           ◎
         </button>
