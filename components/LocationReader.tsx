@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Building } from "@/app/admin/page";
 
+
 type Fix = {
   lat: number;
   lng: number;
@@ -25,6 +26,7 @@ export default function LocationReader({ buildings }: { buildings: Building[] })
   const [error, setError] = useState<string | null>(null);
   const [watching, setWatching] = useState(false);
   const [areas, setAreas] = useState<AreaType[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedAreaId, setSelectedAreaId] = useState<number | null>(null);
   const [currentAreaBuildnigs, setCurrentAreaBuildings] = useState<Building[]>([]);
   const watchId = useRef<number | null>(null);
@@ -163,7 +165,7 @@ export default function LocationReader({ buildings }: { buildings: Building[] })
     event.preventDefault();
 
     setError(null);
-
+    setIsLoading(true)
     // Make sure we have a location
     if (!fix) {
       setError("Please get your location first.");
@@ -233,6 +235,7 @@ export default function LocationReader({ buildings }: { buildings: Building[] })
       setSelectedAreaId(null);
 
       alert("Building added successfully!");
+      window.location.reload()
     } catch (error) {
       console.error("Error creating building:", error);
 
@@ -241,6 +244,8 @@ export default function LocationReader({ buildings }: { buildings: Building[] })
           ? error.message
           : "Failed to create building."
       );
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -380,8 +385,11 @@ export default function LocationReader({ buildings }: { buildings: Building[] })
         <button
           type="submit"
           className="border border-gray-300 rounded py-2 px-4"
+          disabled={isLoading}
         >
-          Add Building
+          {
+            isLoading ? "Adding building..." : "Add Building"
+          }
         </button>
       </form>
     </div>

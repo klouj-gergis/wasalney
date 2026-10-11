@@ -57,7 +57,7 @@ export default function page() {
     onClick={() => setIsAreaFormVisible(false)}
   >
     <div onClick={(e) => e.stopPropagation()}>
-      <AreaForm />
+      <AreaForm setIsAreaFormVisible={setIsAreaFormVisible} />
     </div>
   </div>
 )}
