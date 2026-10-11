@@ -15,9 +15,11 @@ export type Building = {
 export default function page() {
   const [buildings, setBuildings] = useState<Building[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [isAreaFormVisible, setIsAreaFormVisible] = useState(false);
   useEffect(() => {
     const fetchBuildings = async () => {
+      setIsLoading(true)
       try {
         const response = await fetch("/api/buildings");
         if (!response.ok) {
@@ -32,6 +34,8 @@ export default function page() {
             ? error.message
             : "Failed to fetch buildings."
         );
+      } finally {
+        setIsLoading(false)
       }
     };
 
@@ -44,6 +48,9 @@ export default function page() {
         <LocationReader buildings={buildings} />
           <button onClick={() => setIsAreaFormVisible(true)} className="border p-2 rounded-lg">add Area</button>
         <h2>Buildings List</h2>
+        {
+          isLoading ? 'loading buildings...' : ''
+        }
         <ul>
           {buildings.map((building) => (
             <li key={building.id}>
